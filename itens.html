@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Itens - PokéPipo</title>
+    <style>
+        /* CSS interno */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #003a6e;
+        }
+
+        .item-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .item-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .item-card img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .item-card h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #003a6e;
+        }
+
+        .item-card p {
+            font-size: 0.9em;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .item-card:hover {
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #003a6e;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Itens - PokéPipo</h1>
+
+    <div id="item-container" class="item-list">
+        <!-- Os itens serão carregados aqui pelo JavaScript -->
+    </div>
+
+    <footer>
+        PokéPipo &copy; 2024
+    </footer>
+
+    <script>
+        // Função para traduzir nomes e descrições
+        function translateItem(item) {
+            const translations = {
+                'pokeball': 'Pokébola',
+                'great-ball': 'Superbola',
+                'ultra-ball': 'Ultra-Bola',
+                'master-ball': 'Mestre Bola',
+                // Adicione mais traduções conforme necessário
+            };
+
+            const name = translations[item.name] || item.name;
+            const effect = item.effect_entries.length > 0 
+                ? translateDescription(item.effect_entries[0].short_effect) 
+                : 'Nenhuma descrição disponível.';
+            const effect_method = translateEffectMethod(item);
+
+            return { name, effect, effect_method };
+        }
+
+        function translateDescription(description) {
+            // Aqui você pode adicionar traduções para as descrições
+            const translations = {
+                'this ball is used to catch pokémon': 'Esta bola é usada para capturar Pokémon',
+                'a very rare ball': 'Uma bola muito rara',
+                // Adicione mais traduções conforme necessário
+            };
+
+            return translations[description.toLowerCase()] || description;
+        }
+
+        function translateEffectMethod(item) {
+            // Adicione a forma de obtenção dos itens
+            const methodTranslations = {
+                'used in battle': 'Usado em batalha',
+                'obtained as a prize': 'Obtido como prêmio',
+                'found in the wild': 'Encontrado na natureza',
+                // Adicione mais métodos conforme necessário
+            };
+
+            // Aqui assumimos que a forma de obtenção é uma propriedade fictícia
+            return methodTranslations[item.effect_entries[0].effect] || 'Forma de obtenção não disponível.';
+        }
+
+        // Função para buscar e exibir itens
+        async function fetchPokemonItems() {
+            const response = await fetch('https://pokeapi.co/api/v2/item?limit=50'); // Aumenta o limite para mais itens
+            const data = await response.json();
+            const items = data.results;
+
+            items.forEach(async item => {
+                const itemDetails = await fetch(item.url).then(res => res.json());
+                const translatedItem = translateItem(itemDetails);
+                displayItem(translatedItem, itemDetails.sprites.default);
+            });
+        }
+
+        function displayItem(item, imageUrl) {
+            const itemContainer = document.getElementById('item-container');
+            
+            const itemCard = document.createElement('div');
+            itemCard.classList.add('item-card');
+
+            const itemImage = document.createElement('img');
+            itemImage.src = imageUrl || 'default-image.png'; // Imagem padrão se não disponível
+            itemImage.alt = item.name;
+
+            const itemName = document.createElement('h2');
+            itemName.textContent = item.name;
+
+            const itemEffect = document.createElement('p');
+            itemEffect.textContent = item.effect;
+
+            const itemEffectMethod = document.createElement('p');
+            itemEffectMethod.textContent = item.effect_method;
+
+            itemCard.appendChild(itemImage);
+            itemCard.appendChild(itemName);
+            itemCard.appendChild(itemEffect);
+            itemCard.appendChild(itemEffectMethod);
+            itemContainer.appendChild(itemCard);
+        }
+
+        // Chamar a função para buscar os itens quando a página carregar
+        fetchPokemonItems();
+    </script>
+</body>
+</html>

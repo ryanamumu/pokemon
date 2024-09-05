@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Zapdos</title>
+    <style>
+        /* CSS interno */
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('zapdos-background.jpg'); /* Imagem de fundo opcional */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #003a6e;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9); /* Fundo branco semi-transparente */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pokemon-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .pokemon-info img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            opacity: 0.8; /* Tornar a imagem um pouco transparente */
+        }
+
+        .details {
+            flex: 1;
+        }
+
+        .details h2 {
+            margin-top: 0;
+            color: #003a6e;
+        }
+
+        .move-list, .nature {
+            margin-top: 20px;
+        }
+
+        .move-list h3, .nature h3 {
+            color: #003a6e;
+        }
+
+        .move-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #003a6e;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Melhor composição para o Zapdos</h1>
+
+        <div class="pokemon-info">
+            <img id="zapdos-image" src="" alt="Zapdos">
+            <div class="details">
+                <h2 id="zapdos-name"></h2>
+                <p id="zapdos-number"></p>
+                <p id="zapdos-type"></p>
+                <p id="zapdos-nature"></p>
+
+                <div class="move-list">
+                    <h3>Movimentos</h3>
+                    <div id="moves-container"></div>
+                </div>
+
+                <div class="nature">
+                    <h3>Natureza</h3>
+                    <p id="nature-description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        pokepipo @2024
+    </footer>
+
+    <script>
+        // Função para buscar e exibir os detalhes do Zapdos
+        async function fetchZapdosDetails() {
+            try {
+                // Dados do Zapdos
+                const zapdosResponse = await fetch('https://pokeapi.co/api/v2/pokemon/145'); // Zapdos ID é 145
+                const zapdosData = await zapdosResponse.json();
+
+                // Imagem, Nome, Número e Tipo
+                document.getElementById('zapdos-image').src = zapdosData.sprites.other['official-artwork'].front_default;
+                document.getElementById('zapdos-name').textContent = zapdosData.name.charAt(0).toUpperCase() + zapdosData.name.slice(1);
+                document.getElementById('zapdos-number').textContent = `Número na Pokédex: ${zapdosData.id}`;
+                document.getElementById('zapdos-type').textContent = `Tipo(s): ${zapdosData.types.map(type => type.type.name).join(', ')}`;
+                
+                // Natureza Timid
+                document.getElementById('zapdos-nature').textContent = 'Melhor Natureza: Timid';
+
+                // Movimentos
+                const moveNames = ['thunderbolt', 'heat-wave', 'roost', 'air-slash'];
+                const movesContainer = document.getElementById('moves-container');
+
+                for (let moveName of moveNames) {
+                    const moveResponse = await fetch(`https://pokeapi.co/api/v2/move/${moveName}`);
+                    const moveData = await moveResponse.json();
+                    const moveItem = document.createElement('div');
+                    moveItem.classList.add('move-item');
+                    moveItem.innerHTML = `
+                        <strong>${moveData.name.charAt(0).toUpperCase() + moveData.name.slice(1)}</strong><br>
+                        Dano: ${moveData.power || 'N/A'}<br>
+                        PP: ${moveData.pp}<br>
+                        Acurácia: ${moveData.accuracy || 'N/A'}<br>
+                        ${moveData.effect_entries.find(entry => entry.language.name === 'en')?.short_effect || 'Descrição não disponível.'}
+                    `;
+                    movesContainer.appendChild(moveItem);
+                }
+                
+                // Adicionar a descrição da natureza Timid
+                document.getElementById('nature-description').textContent = 'A Natureza Timid aumenta a velocidade e diminui o ataque, ideal para Zapdos que se beneficia de uma maior velocidade para agir primeiro e não depende de ataques físicos.';
+
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+                document.querySelector('.container').innerHTML = '<p>Erro ao carregar as informações.</p>';
+            }
+        }
+
+        // Chamar a função ao carregar a página
+        fetchZapdosDetails();
+    </script>
+</body>
+</html>

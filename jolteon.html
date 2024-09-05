@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Jolteon</title>
+    <style>
+        /* CSS interno */
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('jolteon-background.jpg'); /* Imagem de fundo opcional */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #003a6e;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9); /* Fundo branco semi-transparente */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pokemon-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .pokemon-info img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            opacity: 0.8; /* Tornar a imagem um pouco transparente */
+        }
+
+        .details {
+            flex: 1;
+        }
+
+        .details h2 {
+            margin-top: 0;
+            color: #003a6e;
+        }
+
+        .move-list, .nature {
+            margin-top: 20px;
+        }
+
+        .move-list h3, .nature h3 {
+            color: #003a6e;
+        }
+
+        .move-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #003a6e;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Melhor composição para o Jolteon</h1>
+
+        <div class="pokemon-info">
+            <img id="jolteon-image" src="" alt="Jolteon">
+            <div class="details">
+                <h2 id="jolteon-name"></h2>
+                <p id="jolteon-number"></p>
+                <p id="jolteon-type"></p>
+                <p id="jolteon-nature"></p>
+
+                <div class="move-list">
+                    <h3>Movimentos</h3>
+                    <div id="moves-container"></div>
+                </div>
+
+                <div class="nature">
+                    <h3>Natureza</h3>
+                    <p id="nature-description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        pokepipo @2024
+    </footer>
+
+    <script>
+        // Função para buscar e exibir os detalhes do Jolteon
+        async function fetchJolteonDetails() {
+            try {
+                // Dados do Jolteon
+                const jolteonResponse = await fetch('https://pokeapi.co/api/v2/pokemon/135'); // Jolteon ID é 135
+                const jolteonData = await jolteonResponse.json();
+
+                // Imagem, Nome, Número e Tipo
+                document.getElementById('jolteon-image').src = jolteonData.sprites.other['official-artwork'].front_default;
+                document.getElementById('jolteon-name').textContent = jolteonData.name.charAt(0).toUpperCase() + jolteonData.name.slice(1);
+                document.getElementById('jolteon-number').textContent = `Número na Pokédex: ${jolteonData.id}`;
+                document.getElementById('jolteon-type').textContent = `Tipo(s): ${jolteonData.types.map(type => type.type.name).join(', ')}`;
+                
+                // Natureza Timido
+                document.getElementById('jolteon-nature').textContent = 'Melhor Natureza: Timido';
+
+                // Movimentos
+                const moveNames = ['thunderbolt', 'volt-switch', 'shadow-ball', 'hidden-power'];
+                const movesContainer = document.getElementById('moves-container');
+
+                for (let moveName of moveNames) {
+                    const moveResponse = await fetch(`https://pokeapi.co/api/v2/move/${moveName}`);
+                    const moveData = await moveResponse.json();
+                    const moveItem = document.createElement('div');
+                    moveItem.classList.add('move-item');
+                    moveItem.innerHTML = `
+                        <strong>${moveData.name.charAt(0).toUpperCase() + moveData.name.slice(1)}</strong><br>
+                        Dano: ${moveData.power || 'N/A'}<br>
+                        PP: ${moveData.pp}<br>
+                        Acurácia: ${moveData.accuracy || 'N/A'}<br>
+                        ${moveData.effect_entries.find(entry => entry.language.name === 'en')?.short_effect || 'Descrição não disponível.'}
+                    `;
+                    movesContainer.appendChild(moveItem);
+                }
+                
+                // Adicionar a descrição da natureza Timido
+                document.getElementById('nature-description').textContent = 'A Natureza Timido aumenta a Velocidade e diminui o Ataque, ideal para um Jolteon que se beneficia de sua alta Velocidade para atacar primeiro e usar seus ataques elétricos efetivos.';
+
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+                document.querySelector('.container').innerHTML = '<p>Erro ao carregar as informações.</p>';
+            }
+        }
+
+        // Chamar a função ao carregar a página
+        fetchJolteonDetails();
+    </script>
+</body>
+</html>

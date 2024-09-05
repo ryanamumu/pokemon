@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipos de Pokémon e suas Fraquezas</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: whitesmoke; 
+            padding: 20px;
+            border-radius: 15px; /* Bordas arredondadas mais suaves */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2); /* Sombra mais suave */
+        }
+        h1 {
+            text-align: center;
+            color: #003b6f;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            color: #003b6f;
+        }
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        select:hover {
+            background-color: #e0e0e0;
+        }
+        .type-info {
+            padding: 20px;
+            border-radius: 15px; /* Bordas arredondadas mais suaves */
+            background-color: #f9f9f9; /* Cor de fundo mais clara */
+            border: 2px solid #007bff; /* Borda azul clara */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1); /* Sombra suave */
+        }
+        .type-info h2 {
+            font-size: 1.8em;
+            color: #003b6f;
+            margin-bottom: 15px;
+        }
+        .type-info h3 {
+            font-size: 1.3em;
+            color: #007bff;
+            margin-top: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        ul li {
+            background: #e0f7fa;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            color: #007bff;
+            border: 1px solid #b2ebf2; /* Borda azul clara */
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        ul li:hover {
+            background-color: #b2ebf2;
+            transform: scale(1.02);
+        }
+        ul li img {
+            width: 35px; /* Ajuste o tamanho conforme necessário */
+            height: 35px; /* Ajuste o tamanho conforme necessário */
+            margin-right: 10px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        #divr, #divm, #divn {
+            margin-top: 20px;
+            background-color: #fff; /* Fundo branco para as seções */
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #007bff; /* Borda azul clara */
+        }
+        #r {
+            color: green; 
+            font-size: 1.3em;
+        }
+        #rm {
+            color: red;
+        }
+        #nr {
+            color: slateblue;
+        }
+        .error {
+            color: #f44336; /* Vermelho */
+            font-size: 1.2em;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tipos de Pokémon e suas Fraquezas</h1>
+        <label for="type-select">Escolha um tipo:</label>
+        <select id="type-select">
+            <option value="fire">Fogo</option>
+            <option value="water">Água</option>
+            <option value="grass">Grama</option>
+            <option value="electric">Elétrico</option>
+            <option value="ice">Gelo</option>
+            <option value="rock">Pedra</option>
+            <option value="ground">Terra</option>
+            <option value="poison">Veneno</option>
+            <option value="ghost">Fantasma</option>
+            <option value="fighting">Lutador</option>
+            <option value="psychic">Psíquico</option>
+            <option value="dark">Sombrio</option>
+            <option value="fairy">Fada</option>
+            <option value="dragon">Dragão</option>
+            <option value="flying">Voador</option>
+        </select>
+        <div class="type-info" id="type-info">
+            <h2>Informações do Tipo</h2>
+            <p id="type-name"></p>
+            <div id="divr">
+                <h3 id="r">Recebe o dobro de dano (Vantagem):</h3>
+                <ul id="double-damage-to"></ul>
+            </div>
+            <div id="divm">
+                <h3 id="rm">Recebe metade do dano (Fraqueza):</h3>
+                <ul id="half-damage-to"></ul>
+            </div>
+            <div id="divn">
+                <h3 id="nr">Não recebe dano (Imunidade):</h3>
+                <ul id="no-damage-to"></ul>
+            </div>
+        </div>
+        <div class="error" id="error-message" style="display: none;">Erro ao buscar dados. Tente novamente mais tarde.</div>
+    </div>
+
+    <script>
+        document.getElementById('type-select').addEventListener('change', function() {
+            const type = this.value;
+            fetch(`https://pokeapi.co/api/v2/type/${type}/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('type-name').innerText = `Tipo: ${data.name}`;
+                    
+                    const doubleDamageToList = document.getElementById('double-damage-to');
+                    doubleDamageToList.innerHTML = '';
+                    data.damage_relations.double_damage_to.forEach(type => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<img src="images/${type.name}.png" alt="${type.name}"> ${type.name}`;
+                        doubleDamageToList.appendChild(li);
+                    });
+
+                    const halfDamageToList = document.getElementById('half-damage-to');
+                    halfDamageToList.innerHTML = '';
+                    data.damage_relations.half_damage_to.forEach(type => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<img src="images/${type.name}.png" alt="${type.name}"> ${type.name}`;
+                        halfDamageToList.appendChild(li);
+                    });
+
+                    const noDamageToList = document.getElementById('no-damage-to');
+                    noDamageToList.innerHTML = '';
+                    data.damage_relations.no_damage_to.forEach(type => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<img src="images/${type.name}.png" alt="${type.name}"> ${type.name}`;
+                        noDamageToList.appendChild(li);
+                    });
+
+                    // Hide error message
+                    document.getElementById('error-message').style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar dados:', error);
+                    // Show error message
+                    document.getElementById('error-message').style.display = 'block';
+                });
+        });
+
+        // Trigger change event to load initial data
+        document.getElementById('type-select').dispatchEvent(new Event('change'));
+    </script>
+</body>
+</html>
